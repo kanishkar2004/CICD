@@ -35,12 +35,12 @@ pipeline {
 
     stage('Login to ECR') {
       steps {
-        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
+        
           sh '''
             aws ecr get-login-password --region ${AWS_REGION} | \
               docker login --username AWS --password-stdin ${ECR_URI}
           '''
-        }
+        
       }
     }
 
@@ -57,13 +57,13 @@ pipeline {
 
     stage('Deploy to ECS (force new deployment)') {
       steps {
-        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
+        
           sh """
             # Force ECS to pick up the new image by creating a new task definition revision
             # For simplicity we do a 'force-new-deployment' to tell the service to reload latest taskdef
             aws ecs update-service --cluster ${CLUSTER_NAME} --service ${SERVICE_NAME} --force-new-deployment --region ${AWS_REGION}
           """
-        }
+        
       }
     }
   }
